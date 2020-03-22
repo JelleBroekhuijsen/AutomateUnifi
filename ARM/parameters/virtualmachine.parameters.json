@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "solutionprefix": {
+            "value": "$(solutionPrefix)"
+        },
+        "subnetResourceId": {
+            "value": "$(subnetResourceId)"
+        },
+        "automationAccountName": {
+            "value": "$(automationAccountName)"
+        },
+        "storageAccountName": {
+            "value": "$(storageAccountName)"
+        },
+        "adminPassword": {
+            "value": "$(vmPassword)"
+        },
+        "keyVaultName": {
+            "value": "$(keyVaultName)"
+        },
+        "keyVaultUrl": {
+            "value": "$(keyVaultUrl)"
+        },
+        "kekUrl": {
+            "value": "$(kekUrl)"
+        },
+        "dscFilename":{
+            "value": "$(dscFilename)"
+        }
+    }
+}

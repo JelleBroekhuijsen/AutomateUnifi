@@ -1,0 +1,103 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "solutionprefix": {
+            "type": "string",
+            "metadata": {
+                "description": "solution prefix"
+            }
+        },
+        "dscFilename": {
+            "type": "string",
+            "metadata": {
+                "description": "dsc conguration name"
+            }
+        },
+        "dscSourceUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "dsc conguration zipfile location"
+            }
+        }
+    },
+    "variables": {
+        "automationAccountName": "[tolower(take(concat(parameters('solutionprefix'),uniqueString(resourceGroup().id)),24))]",
+        "cChocoDscModuleUri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg",
+        "dscCompileJobName": "[guid(resourceGroup().id, deployment().name)]",
+        "dscConfigurationName":"[replace(parameters('dscFilename'),'.ps1','')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('automationaccountName')]",
+            "type": "Microsoft.Automation/automationAccounts",
+            "apiVersion": "2015-10-31",
+            "location": "[resourceGroup().location]",
+            "tags": {
+            },
+            "properties": {
+                "sku": {
+                    "name": "Free"
+                }
+            },
+            "resources": [
+                {
+                    "name": "cChoco",
+                    "type": "modules",
+                    "apiVersion": "2015-10-31",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+                    ],
+                    "properties": {
+                        "contentLink": {
+                            "uri": "[variables('cChocoDscModuleUri')]"
+                        }
+                    }
+                },
+                {
+                    "Name": "[variables('dscConfigurationName')]",
+                    "type": "configurations",
+                    "apiVersion": "2015-10-31",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]",
+                        "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'),'/modules/cChoco')]"
+                    ],
+                    "properties": {
+                        "state": "Published",
+                        "overwrite": "true",
+                        "source": {
+                            "type": "uri",
+                            "value": "[parameters('dscSourceUrl')]"
+                        }
+                    }
+                },
+                {
+                    "name": "[variables('dscCompileJobName')]",
+                    "type": "compilationjobs",
+                    "apiVersion": "2018-01-15",
+                    "tags": {
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]",
+                        "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'),'/configurations/',variables('dscConfigurationName'))]"
+                    ],
+                    "properties": {
+                        "configuration": {
+                            "name": "[variables('dscConfigurationName')]"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "automationAccountName": {
+            "type": "string",
+            "value": "[variables('automationaccountName')]"
+        }
+    },
+    "functions": [
+    ]
+}

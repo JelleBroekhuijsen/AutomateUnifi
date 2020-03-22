@@ -1,0 +1,92 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "solutionprefix": {
+            "type": "string",
+            "metadata": {
+                "description": "solution prefix"
+            }
+        },
+        "adoAadObjectId": {
+            "type": "string",
+            "metadata": {
+                "description": "ado service principal aad object id"
+            }
+        },
+        "jllAadObjectId": {
+            "type": "string",
+            "metadata": {
+                "description": "ado service principal aad object id"
+            }
+        }
+    },
+    "variables": {
+        "keyVaultName": "[tolower(take(concat(parameters('solutionprefix'),uniqueString(resourceGroup().id)),24))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.keyVault/vaults",
+            "apiVersion": "2018-02-14",
+            "name": "[variables('keyVaultName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[parameters('solutionprefix')]"
+            },
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForDiskEncryption": true,
+                "tenantId": "[subscription().tenantId]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[parameters('adoAadObjectId')]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Create",
+                                "Update"
+                            ],
+                            "secrets": [
+                                "List",
+                                "Get",
+                                "Set"
+                            ]
+                        }
+                    },
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[parameters('jllAadObjectId')]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Create",
+                                "Update"
+                            ],
+                            "secrets": [
+                                "List",
+                                "Get",
+                                "Set"
+                            ]
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "standard",
+                    "family": "A"
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "keyVaultName": {
+            "type": "string",
+            "value": "[variables('keyVaultName')]"
+        }
+    },
+    "functions": [
+    ]
+}
