@@ -38,13 +38,7 @@
                 "description": "name of keyVault"
             }
         },
-        "keyVaultUrl": {
-            "type": "string",
-            "metadata": {
-                "description": "url of keyVault"
-            }
-        },
-        "kekUrl": {
+        "kekUri": {
             "type": "string",
             "metadata": {
                 "description": "url of key encryption key"
@@ -64,7 +58,7 @@
         "vmSize": "Standard_B1s",
         "adminUserName": "unifi-admin",
         "vmImageSku": "2019-Datacenter-Core",
-        "kekUrl": "[replace(parameters('kekUrl'),':443','')]",
+        "kekUri": "[replace(parameters('kekUri'),':443','')]",
         "dscNodeConfigurationName":"[replace(parameters('dscFilename'),'.ps1','.localhost')]"
     },
     "resources": [
@@ -237,7 +231,7 @@
                 {
                     "type": "extensions",
                     "name": "[concat(parameters('solutionprefix'),'-diskencryption')]",
-                    "apiVersion": "2019-07-01",
+                    "apiVersion": "2017-12-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
                         "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
@@ -251,9 +245,9 @@
                         "settings": {
                             "EncryptionOperation": "EnableEncryption",
                             "KeyEncryptionAlgorithm": "RSA-OAEP",
-                            "keyVaultURL": "[parameters('keyVaultUrl')]",
+                            "keyVaultURL": "[reference(resourceId('Microsoft.Keyvault/vaults',parameters('keyVaultName')),'2018-02-14').vaultUri]",
                             "keyVaultResourceId": "[resourceId('Microsoft.Keyvault/vaults',parameters('keyVaultName'))]",
-                            "KeyEncryptionKeyURL": "[variables('kekUrl')]",
+                            "DiskEncryptionKeyURL": "[variables('kekUri')]",
                             "VolumeType": "All"
                         }
                     }

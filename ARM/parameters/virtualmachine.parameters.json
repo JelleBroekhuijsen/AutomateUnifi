@@ -20,11 +20,8 @@
         "keyVaultName": {
             "value": "$(keyVaultName)"
         },
-        "keyVaultUrl": {
-            "value": "$(keyVaultUrl)"
-        },
-        "kekUrl": {
-            "value": "$(kekUrl)"
+        "kekUri": {
+            "value": "$(kekUri)"
         },
         "dscFilename":{
             "value": "$(dscFilename)"

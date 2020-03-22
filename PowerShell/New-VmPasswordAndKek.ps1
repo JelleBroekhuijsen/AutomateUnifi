@@ -58,7 +58,7 @@ function New-SecretValue {
 		[int]$specialCharactersCount = 2,
 		
 		[parameter(Mandatory=$false)]
-		[string]$specialCharacters = '!$%&=?@#*+'
+		[string]$specialCharacters = '!%&=?@#*+'
 	)
 
 	[string]$newRandomString = ""
@@ -98,8 +98,8 @@ $vmPassword = New-SecretValue | ConvertTo-SecureString -AsPlainText -Force
 
 #set vmpassword in keyvault
 try{
-	Set-AzKeyVaultSecret -VaultName $keyvault.VaultName -Name $vmPasswordSecretName -SecretValue $vmPassword -ErrorAction Stop | Out-Null
-	Write-Output "##vso[task.setvariable variable=vmPassword;issecret=true]$vmPassword"
+	$result = Set-AzKeyVaultSecret -VaultName $keyvault.VaultName -Name $vmPasswordSecretName -SecretValue $vmPassword -ErrorAction Stop
+	Write-Output "##vso[task.setvariable variable=vmPassword;issecret=true]$($result.SecretValueText)"
 	Write-Output "Added VSTS variable 'vmPassword' ('$($vmPassword.getType().name)')"
 }
 catch{
@@ -112,10 +112,8 @@ $keyEncryptionKeySecretName = 'keyEncryptionKey'
 #set kek in keyvault
 try{
 	$result = Add-AzKeyVaultKey -Name $keyEncryptionKeySecretName -VaultName $keyvault.VaultName -Destination Software -Size 4096 -ErrorAction Stop
-	Write-Output "##vso[task.setvariable variable=keyVaultUrl]$($keyvault.VaultUri)"
-	Write-Output "Added VSTS variable 'keyVaultUrl' ('$($keyvault.VaultUri.getType().name)') with value '$($keyvault.VaultUri)'"
-	Write-Output "##vso[task.setvariable variable=kekUrl]$($result.id)"
-	Write-Output "Added VSTS variable 'kekUrl' ('$($result.id.getType().name)') with value '$($result.id)'"
+	Write-Output "##vso[task.setvariable variable=kekUri]$($result.id)"
+	Write-Output "Added VSTS variable 'kekUri' ('$($result.id.getType().name)') with value '$($result.id)'"
 }
 catch{
 	Write-Error "Add-AzKeyVaultKey threw an error: $($error[0])"
