@@ -1,0 +1,26 @@
+name: automate-unifi
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - Documentation
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    pool: 
+      vmImage: vs2017-win2016
+    steps:
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathToPublish: './ARM/'
+        ArtifactName: 'ARM'
+        publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathToPublish: './PowerShell/'
+        ArtifactName: 'PowerShell'
+        publishLocation: 'Container'
+    
