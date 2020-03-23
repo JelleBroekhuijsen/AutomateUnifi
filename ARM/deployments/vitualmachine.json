@@ -59,7 +59,8 @@
         "adminUserName": "unifi-admin",
         "vmImageSku": "2019-Datacenter-Core",
         "kekUri": "[replace(parameters('kekUri'),':443','')]",
-        "dscNodeConfigurationName":"[replace(parameters('dscFilename'),'.ps1','.localhost')]"
+        "dscNodeConfigurationName":"[replace(parameters('dscFilename'),'.ps1','.localhost')]",
+        "keyVaultResourceId": "[resourceId('Microsoft.Keyvault/vaults',parameters('keyVaultName'))]"
     },
     "resources": [
         {
@@ -231,7 +232,7 @@
                 {
                     "type": "extensions",
                     "name": "[concat(parameters('solutionprefix'),'-diskencryption')]",
-                    "apiVersion": "2017-12-01",
+                    "apiVersion": "2019-07-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
                         "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
@@ -242,12 +243,14 @@
                         "type": "AzureDiskEncryption",
                         "typeHandlerVersion": "2.2",
                         "autoUpgradeMinorVersion": true,
+                        "forceUpdateTag": "1.0",
                         "settings": {
                             "EncryptionOperation": "EnableEncryption",
                             "KeyEncryptionAlgorithm": "RSA-OAEP",
-                            "keyVaultURL": "[reference(resourceId('Microsoft.Keyvault/vaults',parameters('keyVaultName')),'2018-02-14').vaultUri]",
-                            "keyVaultResourceId": "[resourceId('Microsoft.Keyvault/vaults',parameters('keyVaultName'))]",
-                            "DiskEncryptionKeyURL": "[variables('kekUri')]",
+                            "KeyVaultURL": "[reference(variables('keyVaultResourceId'),'2018-02-14').vaultUri]",
+                            "KekVaultResourceId": "[variables('keyVaultResourceId')]",
+                            "KeyEncryptionKeyURL": "[variables('kekUri')]",
+                            "KeyVaultResourceId":"[variables('keyVaultResourceId')]",
                             "VolumeType": "All"
                         }
                     }

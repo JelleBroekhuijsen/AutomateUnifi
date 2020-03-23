@@ -94,17 +94,22 @@ Write-Output "Using keyvault: $($keyvault.VaultName)"
 
 #generate vm password
 $vmPasswordSecretName = 'vmPassword'
-$vmPassword = New-SecretValue | ConvertTo-SecureString -AsPlainText -Force
 
-#set vmpassword in keyvault
-try{
-	$result = Set-AzKeyVaultSecret -VaultName $keyvault.VaultName -Name $vmPasswordSecretName -SecretValue $vmPassword -ErrorAction Stop
+#in case of redeployment the already existing password is used
+$result = Get-AzKeyVaultSecret -VaultName $keyvault.VaultName -Name $vmPasswordSecretName -ErrorAction Stop
+if($result){
 	Write-Output "##vso[task.setvariable variable=vmPassword;issecret=true]$($result.SecretValueText)"
-	Write-Output "Added VSTS variable 'vmPassword' ('$($result.SecretValueText.getType().name)' with value: '$($result.SecretValueText)')"
-	#Write-Output "Added VSTS variable 'vmPassword' ('$($vmPassword.getType().name)')"
-}
-catch{
-	Write-Error "Set-AzKeyvaultSecret threw an error: $($error[0])"
+	Write-Output "Added VSTS variable 'vmPassword' ('$($result.SecretValue.getType().name)')"
+}else{
+	try{
+		$vmPassword = New-SecretValue | ConvertTo-SecureString -AsPlainText -Force
+		$result = Set-AzKeyVaultSecret -VaultName $keyvault.VaultName -Name $vmPasswordSecretName -SecretValue $vmPassword -ErrorAction Stop
+		Write-Output "##vso[task.setvariable variable=vmPassword;issecret=true]$($result.SecretValueText)"
+		Write-Output "Added VSTS variable 'vmPassword' ('$($result.SecretValue.getType().name)')"
+	}
+	catch{
+		Write-Error "Set-AzKeyvaultSecret threw an error: $($error[0])"
+	}
 }
 
 #generate KEK
