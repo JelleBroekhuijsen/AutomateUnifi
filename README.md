@@ -37,8 +37,8 @@ The powershell scripts include:
 - Automatically restore backups
 
 ## Release notes
-2020-03-23: Added a reference yml-build file and fixed an issue where a vm password would be generated on a incremental deployment
-2020-03-22: Initial release
+- 2020-03-23: Added a reference yml-build file and fixed an issue where a vm password would be generated on a incremental deployment
+- 2020-03-22: Initial release
 
 ## How-to / design:
 [Automating Desired State Configuration](https://blog.jll.io/2020/03/23/automating-desired-state-configuration/)
