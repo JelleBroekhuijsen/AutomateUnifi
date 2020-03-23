@@ -100,7 +100,8 @@ $vmPassword = New-SecretValue | ConvertTo-SecureString -AsPlainText -Force
 try{
 	$result = Set-AzKeyVaultSecret -VaultName $keyvault.VaultName -Name $vmPasswordSecretName -SecretValue $vmPassword -ErrorAction Stop
 	Write-Output "##vso[task.setvariable variable=vmPassword;issecret=true]$($result.SecretValueText)"
-	Write-Output "Added VSTS variable 'vmPassword' ('$($vmPassword.getType().name)')"
+	Write-Output "Added VSTS variable 'vmPassword' ('$($result.SecretValueText.getType().name)' with value: '$($result.SecretValueText)')"
+	#Write-Output "Added VSTS variable 'vmPassword' ('$($vmPassword.getType().name)')"
 }
 catch{
 	Write-Error "Set-AzKeyvaultSecret threw an error: $($error[0])"
