@@ -55,11 +55,11 @@
         "nicName": "[tolower(concat(parameters('solutionprefix'),'-nic'))]",
         "privateIpAddress": "10.0.10.4",
         "vmName": "[tolower(parameters('solutionprefix'))]",
-        "vmSize": "Standard_B1s",
+        "vmSize": "Standard_B1ms",
         "adminUserName": "unifi-admin",
-        "vmImageSku": "2019-Datacenter-Core",
+        "vmImageSku": "2019-Datacenter",
         "kekUri": "[replace(parameters('kekUri'),':443','')]",
-        "dscNodeConfigurationName":"[replace(parameters('dscFilename'),'.ps1','.localhost')]",
+        "dscNodeConfigurationName": "[replace(parameters('dscFilename'),'.ps1','.localhost')]",
         "keyVaultResourceId": "[resourceId('Microsoft.Keyvault/vaults',parameters('keyVaultName'))]"
     },
     "resources": [
@@ -218,7 +218,7 @@
                             }
                         },
                         "settings": {
-                             "configurationArguments": {
+                            "configurationArguments": {
                                 "RegistrationUrl": "[reference(resourceId('Microsoft.Automation/automationAccounts/', parameters('automationAccountName')), '2018-06-30').registrationUrl]",
                                 "NodeConfigurationName": "[variables('dscNodeConfigurationName')]",
                                 "ConfigurationMode": "ApplyAndAutoCorrect",
@@ -250,7 +250,7 @@
                             "KeyVaultURL": "[reference(variables('keyVaultResourceId'),'2018-02-14').vaultUri]",
                             "KekVaultResourceId": "[variables('keyVaultResourceId')]",
                             "KeyEncryptionKeyURL": "[variables('kekUri')]",
-                            "KeyVaultResourceId":"[variables('keyVaultResourceId')]",
+                            "KeyVaultResourceId": "[variables('keyVaultResourceId')]",
                             "VolumeType": "All"
                         }
                     }
